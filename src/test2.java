@@ -10,6 +10,7 @@ public class test2 extends JFrame {
 
     }
 
+    
     public void paint(Graphics g)
     {
         super.paint(g);
