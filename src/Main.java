@@ -60,7 +60,7 @@ public class Main extends Frame {
     public Main()
     {
         try {
-            im = ImageIO.read(new File("C:/Users/zhigulinvv.28/java/src/солнце1.jpg"));  } catch (IOException e) {
+            im = ImageIO.read(new File("H:/сегодня картинка/images.png"));  } catch (IOException e) {
             throw new RuntimeException(e);
         }
 
