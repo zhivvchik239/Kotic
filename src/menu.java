@@ -24,12 +24,14 @@ public class menu extends JFrame {
 
             if (e.getPoint().x>275 && e.getPoint().x<525 && e.getPoint().y>33 && e.getPoint().y<185)
             {
+                dispose();
                 new test2();
 // System.out.println("start!!!");
 // System.exit(0);
             }
             if (e.getPoint().x>275 && e.getPoint().x<525 && e.getPoint().y>225 && e.getPoint().y<372)
             {
+                dispose();
                 JFrame settings = new JFrame("Настройки");
                 settings.setSize(300,200);
                 settings.setVisible(true);
