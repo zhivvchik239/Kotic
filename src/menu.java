@@ -1,94 +1,118 @@
-import javax.imageio.ImageIO;
-import javax.swing.*;
-import java.awt.*;
-import java.awt.event.KeyListener;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
-import java.io.File;
+import javax.imageio.ImageIO; // Импортируем класс для загрузки картинок из файла
+import javax.swing.*; // Импортируем Swing для окон (JFrame, JPanel, кнопки)
+import java.awt.*; // Импортируем AWT для графики (отрисовка фона, цвета)
+import java.awt.image.BufferedImage; // Для хранения картинки в памяти
+import java.io.File; // Для указания пути к файлу картинки
 
+// Класс menu наследуется от JFrame, то есть сам по себе является главным окном программы.
 public class menu extends JFrame {
-    public BufferedImage bg, button_start, button_setting, button_exit;
 
-    MouseListener ml = new MouseListener()
-    {
+    // Переменная для хранения картинки-фона. BufferedImage - это стандартный тип
+    // для изображений в Java.
+    public BufferedImage bg;
 
-        @Override
-        public void mouseClicked(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mousePressed(MouseEvent e) {
-            System.out.println(e.getPoint().x+ " "+ e.getPoint().y);
-
-            if (e.getPoint().x>275 && e.getPoint().x<525 && e.getPoint().y>33 && e.getPoint().y<185)
-            {
-                dispose();
-                new test2();
-// System.out.println("start!!!");
-// System.exit(0);
-            }
-            if (e.getPoint().x>275 && e.getPoint().x<525 && e.getPoint().y>225 && e.getPoint().y<372)
-            {
-                dispose();
-                JFrame settings = new JFrame("Настройки");
-                settings.setSize(300,200);
-                settings.setVisible(true);
-            }
-            if (e.getPoint().x>275 && e.getPoint().x<525 && e.getPoint().y>412 && e.getPoint().y<567)
-            {
-                System.exit(0);
-            }
-
-        }
-
-        @Override
-        public void mouseReleased(MouseEvent e) {
-
-
-        }
-
-        @Override
-        public void mouseEntered(MouseEvent e) {
-
-        }
-
-        @Override
-        public void mouseExited(MouseEvent e) {
-
-        }
-    };
-
-    menu()
-    {
+    // Конструктор меню. Вызывается один раз при запуске программы (new menu()).
+    menu() {
         try {
+            // Пытаемся загрузить картинку "phon.png" из папки src и сохранить её в
+            // переменную bg.
+            // ImageIO.read - это встроенный метод Java для чтения картинок.
             bg = ImageIO.read(new File("src/phon.png"));
-            button_start = ImageIO.read(new File("src/knopka1.png"));
-            button_setting = ImageIO.read(new File("src/knopka3.png"));
-            button_exit = ImageIO.read(new File("src/knopka4.png"));
-        } catch (Exception e){
+        } catch (Exception e) {
+            // Если файл не найден или произошла ошибка (например, картинка повреждена),
+            // программа аварийно завершится и выведет ошибку в консоль.
             throw new RuntimeException(e);
         }
 
+        setSize(800, 600); // Устанавливаем размеры окна: 800 пикселей в ширину, 600 в высоту.
+        setTitle("Эхо света"); // Устанавливаем заголовок окна (текст в верхней синей полоске).
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // Говорим Java: "Когда нажмут на крестик, полностью закрой
+                                                        // программу".
+        setResizable(false); // Запрещаем пользователю растягивать окно мышкой (чтобы кнопки не съезжали).
 
-        setSize(800,600);
-        setVisible(true);
-        setTitle("game");
-        addMouseListener(ml);
-    }
-    public void paint(Graphics g)
-    {
-        super.paint(g);
-        g.drawImage(bg,0,0,this);
-        g.drawImage(button_start,275,33,this);
-        g.drawImage(button_setting,275,225,this);
-        g.drawImage(button_exit,275,412,this);
+        // Создаем кастомную панель (JPanel).
+        // Мы делаем это, чтобы отделить фоновую картинку от кнопок. Кнопки не будут
+        // перекрывать фон.
+        JPanel bgPanel = new JPanel() {
+            // Переопределяем метод отрисовки этой панели.
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g); // Вызываем стандартную отрисовку (очистку панели).
+                if (bg != null) { // Проверка: если картинка загрузилась (не null), то рисуем её.
+                    // Рисуем картинку bg в координатах (0,0) и растягиваем её на весь размер панели
+                    // (getWidth, getHeight).
+                    g.drawImage(bg, 0, 0, getWidth(), getHeight(), this);
+                }
+            }
+        };
 
-    }
-    public static void main(String[] args)
-    {
-        new menu();
+        bgPanel.setLayout(null); // Отключаем автоматическую расстановку элементов.
+        // Теперь мы сами будем указывать координаты кнопок (через setBounds). Это дает
+        // полный контроль над дизайном.
+
+        setContentPane(bgPanel); // Говорим окну: "Главной панелью (контейнером) будет наша панель с фоном".
+
+        // Создание кнопки "Играть"
+        // Создаем экземпляр нашей кастомной кнопки, передаем текст "ИГРАТЬ" и красный
+        // цвет (255, 42, 42).
+        NeonButton btnPlay = new NeonButton("ИГРАТЬ", new Color(255, 42, 42));
+        // Устанавливаем координаты и размер: X=250, Y=100, Ширина=300, Высота=80.
+        btnPlay.setBounds(250, 100, 300, 80);
+
+        // Добавляем "слушатель" событий. Это код, который выполнится, когда игрок
+        // кликнет по кнопке.
+        btnPlay.addActionListener(e -> {
+            dispose(); // Закрываем окно меню (уничтожаем его, чтобы освободить память).
+
+            // Создаем новое окно (JFrame) для самой игры.
+            JFrame gameFrame = new JFrame("Эхо света - Игра");
+            gameFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE); // При закрытии игры закрывается вся программа.
+            gameFrame.setSize(800, 600); // Размер игрового окна.
+            gameFrame.setResizable(false); // Запрещаем менять размер.
+            gameFrame.setLocationRelativeTo(null); // Открываем игровое окно ровно по центру экрана.
+
+            // Создаем экземпляр нашего игрового поля (класс Game, который мы напишем в
+            // другом файле)
+            // и добавляем его в игровое окно.
+            gameFrame.add(new Game());
+
+            gameFrame.setVisible(true); // Показываем игровое окно на экране.
+        });
+        bgPanel.add(btnPlay); // Добавляем кнопку "ИГРАТЬ" на нашу фоновую панель.
+
+        // Создание кнопки "Настройки"
+        // По аналогии создаем голубую кнопку.
+        NeonButton btnSettings = new NeonButton("НАСТРОЙКИ", new Color(42, 255, 255));
+        btnSettings.setBounds(250, 250, 300, 80); // Ставим её ниже.
+
+        btnSettings.addActionListener(e -> {
+            // При клике создаем новое окно (JFrame) для настроек.
+            JFrame settings = new JFrame("Настройки");
+            settings.setSize(300, 200); // Делаем его маленьким.
+            settings.setLocationRelativeTo(null); // Центрируем на экране.
+            settings.setVisible(true); // Показываем окно настроек.
+            // Окно меню не закрываем, оно остается на фоне.
+        });
+        bgPanel.add(btnSettings); // Добавляем кнопку на панель.
+
+        // Создание кнопки "Выход"
+        // Создаем зеленую кнопку.
+        NeonButton btnExit = new NeonButton("ВЫХОД", new Color(42, 255, 42));
+        btnExit.setBounds(250, 400, 300, 80); // Ставим её в самом низу.
+
+        btnExit.addActionListener(e -> {
+            System.exit(0); // Метод System.exit(0) немедленно завершает работу всей программы. 0 означает
+                            // "успешный выход".
+        });
+        bgPanel.add(btnExit); // Добавляем кнопку на панель.
+
+        setVisible(true); // В самом конце делаем главное окно меню видимым (появляется на экране).
     }
 
+    // Метод main - это точка входа в программу. С неё начинается выполнение любого
+    // Java-кода.
+    public static void main(String[] args) {
+        new menu(); // Создаем экземпляр нашего меню. Вызывается конструктор menu(), который мы
+                    // написали выше.
+    }
 }
